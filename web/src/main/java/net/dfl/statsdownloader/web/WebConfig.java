@@ -11,7 +11,8 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 @Configuration
 @EnableWebMvc
 public class WebConfig {
-		
+	
+	/*
     @Bean(name = "viewResolver")
     public ViewResolver getViewResolver() {
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();
@@ -34,5 +35,5 @@ public class WebConfig {
         templateResolver.setSuffix(".html");
         return templateResolver;
     }
-
+	*/
 }
