@@ -1,4 +1,4 @@
-package net.dfl.statsdownloader.web;
+package net.dfl.statsdownloader;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

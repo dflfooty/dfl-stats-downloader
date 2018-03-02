@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>web</artifactId>
+	<artifactId>worker</artifactId>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -11,7 +11,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<name>DFL stats downloader web</name>
+	<name>DFL stats downloader worker</name>
 	<url>https://dfl-fantasy-football.net</url>
 
 	<dependencies>
@@ -28,12 +28,18 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-chrome-driver</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>4.1</version>
 		</dependency>
 
 		<dependency>
@@ -54,7 +60,7 @@
 							<goal>repackage</goal>
 						</goals>
 						<configuration>
-							<finalName>web-${version}</finalName>
+							<finalName>worker-${version}</finalName>
 							<excludes>
 								<exclude>
 									<groupId>org.flywaydb</groupId>

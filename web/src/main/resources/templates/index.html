@@ -1,10 +1,78 @@
-<!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+
 <head>
-    <title>DFL: Stats Downloader</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta charset="UTF-8"/>
+<title>DFL Manager - AFL Stats Download</title>
+<link rel="stylesheet" th:href="@{/static/css/styles.css}" type="text/css" media="screen"/>
+<link rel="stylesheet" th:href="@{/static/css/bootstrap-3.3.7.min.css}" type="text/css" media="screen"/>
+<link rel="stylesheet" th:href="@{/static/css/datatables-1.10.16.min.css}" type="text/css" media="screen"/>
+<script th:src="@{/static/js/functions.js}" type="text/javascript"></script>
+<script th:src="@{/static/js/jquery-3.3.1.min.js}" type="text/javascript"></script>
+<script th:src="@{/static/js/bootstrap-3.3.7.min.js}" type="text/javascript"></script>
+<script th:src="@{/static/js/datatables-1.10.16.min.js}" type="text/javascript"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+	    $('#jobs').DataTable();
+	    //retrieveJobs;
+	    //setInterval(retrieveJobs, 5000);
+	}
+	);
+</script>
 </head>
+
 <body>
-<p th:text="'Testing... ' + ${text} + '!'" />
+
+<div id="wrap">
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">DFL Manager</a>
+            </div>
+            <div class="collapse navbar-collapse"></div>
+        </div>
+    </div>
+	<div class="container">
+	    <div class="page-header">
+	        <h3>AFL Stats Download</h3>
+	    </div>
+	    <div class="panel-group">
+	        <div class="panel panel-default">
+	            <div class="panel-heading">Submit Job</div>
+	            <div class="panel-body">
+	                <form id="jobForm" class="form-inline" th:action="@{/jobs/submit}" th:object="${job}" method="post">
+	                    <div class="form-group">
+	                        <label for="yearInput">Year:</label>
+	                        <input id="yearInput" class="form-control" type="text" th:field="*{year}" required="required" placeholder="Enter year"/>
+	                    </div>
+	                    <div class="form-group">
+	                        <label for="roundInput">Round:</label>
+	                        <input id="roundInput" class="form-control" type="text" th:field="*{round}" required="required" placeholder="Enter round"/>
+	                    </div>
+	                    <button type="submit" class="btn btn-default">Submit</button>
+	                </form>
+	                <div class="text-danger top-buffer" th:unless="${#strings.isEmpty(errorMessage)}" th:text="#{${errorMessage}}">Error Message</div>
+	            </div>
+	        </div>
+	        <div class="panel panel-default">
+	            <div class="panel-heading">Jobs</div>
+	            <div class="panel-body">
+	                <script>
+	                    retrieveJobs;
+	                    setInterval(retrieveJobs, 5000);
+	                </script>
+	                <div id="jobsBlock">
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+</div>
 </body>
 </html>

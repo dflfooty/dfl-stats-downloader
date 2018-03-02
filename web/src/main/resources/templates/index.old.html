@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+<meta charset="UTF-8"/>
+<title>DFL Stats Downloader</title>
+<link rel="stylesheet" th:href="@{/static/css/styles.css}" type="text/css" media="screen"/>
+<script th:src="@{/static/js/functions.js}" type="text/javascript"></script>
+<script th:src="@{/static/js/jquery-3.3.1.min.js}" type="text/javascript"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+            retrieveJobs;
+            setInterval(retrieveJobs, 5000);
+        }
+    	);
+</script>
+</head>
+
+<body>
+<div style="width:800px; margin:0 auto;">
+
+<h1>DFL download AFL stats</h1>
+
+<div class="main-block">
+    <span class="subtitle">AFL round details</span>
+    <form id="jobForm" th:action="@{/jobs/submit}" th:object="${job}" method="post">
+        <div class="insertBlock">
+            <span class="formSpan">
+                <input id="yearInput" type="text" th:field="*{year}" required="required"/>
+                <br />
+                <label for="yearInput">Year:</label>
+            </span>
+            <span class="formSpan" style="margin-bottom:20px">
+                <input id="roundInput" type="text" th:field="*{round}" required="required"/>
+                <br />
+                <label for="roundInput">Round:</label>
+            </span>         
+            <input type="submit" value="Submit"/>
+        </div>
+    </form>
+
+    <form>
+        <span class="subtitle">Download Jobs</span>
+        <div class="listBlock">            
+            <!-- Results block -->
+            <div id="jobsBlock">
+            </div>
+        </div>
+        
+    </form>
+</div>
+
+</div>
+</body>
+</html>
