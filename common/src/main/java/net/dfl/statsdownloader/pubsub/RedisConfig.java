@@ -17,16 +17,17 @@ import redis.clients.jedis.JedisPoolConfig;
 @Configuration
 public class RedisConfig {
 	
+	/*
 	@Value("${redis.url}")
 	private String redisUrl;
 	
-	@Value("${redis.pool.max-active")
+	@Value("${spring.redis.pool.max-active}")
 	private int redisPoolMaxActive;
 	
-	@Value("${redis.pool.max-idle")
+	@Value("${spring.redis.pool.max-idle}")
 	private int redisPoolMaxIdle;
 	
-	@Value("${redis.pool.min-idle")
+	@Value("${spring.redis.pool.min-idle}")
 	private int redisPoolMinIdle;
 	
 
@@ -53,6 +54,7 @@ public class RedisConfig {
 			throw new RuntimeException("Redis couldn't be configured from URL in REDIS_URL env var: " + System.getenv("REDIS_URL"));
 		}
 	}
+	*/
 	
 	@Bean
     public ChannelTopic topic() {

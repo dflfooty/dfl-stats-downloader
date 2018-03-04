@@ -12,7 +12,8 @@ spring:
       max-active: 10
   redis:
     url: ${REDIS_URL}
+    database: 0
     pool:
-      max-active: 10
-      max-idle: 5
-      min-idle: 1 
+      max-active: 8
+      max-idle: 8
+      min-idle: 1
