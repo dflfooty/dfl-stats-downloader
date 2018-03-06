@@ -65,4 +65,15 @@ public class JobService {
 		
 		return savedJob;
 	}
+	
+	public void cleanUncompletedJobs() {
+		List<Job> uncompletedJobs = jobRespositry.findUncompletedJobs();
+		for(Job job : uncompletedJobs) {
+			Date now = new Date();
+			job.setUpdatedAt(now);
+			job.setStatus("Uncompleted");
+			jobRespositry.save(job);
+		}
+		jobRespositry.flush();
+	}
 }

@@ -26,7 +26,7 @@
                     <td th:text="${job.createdAt}">createdAt</td>
                     <td th:text="${job.updatedAt}">updatecAt</td>
                     <td th:text="${job.status}">status</td>
-                    <td><a th:if="${job.file} != null" th:href="@{${job.file}}">Download</a></td>
+                    <td><a th:if="${job.file} != null" th:href="@{${job.file}}" target="_blank">Download</a></td>
                 </tr>
             </tbody>
         </table>

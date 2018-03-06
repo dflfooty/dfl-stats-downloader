@@ -22,6 +22,8 @@ import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.WebClient;
 import com.opencsv.CSVWriter;
 
 import net.dfl.statsdownloader.model.Fixture;
@@ -53,7 +55,16 @@ public class StatsHelper {
 			capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, new String[] { "--load-images=no", "--webdriver-loglevel=NONE" });
 			webDriver = new PhantomJSDriver(capabilities);
 		} else if(headlessBrowser.equalsIgnoreCase("htmlunit")) {
-			webDriver = new HtmlUnitDriver(true);
+			webDriver = new HtmlUnitDriver(BrowserVersion.CHROME) {
+		        @Override
+		        protected WebClient newWebClient(BrowserVersion version) {
+		            WebClient webClient = super.newWebClient(version);
+		            webClient.getOptions().setThrowExceptionOnScriptError(false);
+		            webClient.getOptions().setCssEnabled(false);
+		            webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+		            return webClient;
+		        }
+			};
 		} else {
 			ChromeOptions options = new ChromeOptions();
 			options.setBinary(chromeBin);
