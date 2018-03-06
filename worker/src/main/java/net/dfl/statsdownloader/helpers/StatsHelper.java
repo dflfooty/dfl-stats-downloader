@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -37,51 +36,41 @@ public class StatsHelper {
 	
 	private static final String chromeBin = System.getenv("GOOGLE_CHROME_BIN");
 	
-	private WebDriver webDriver;
-	
-	
+	//private WebDriver webDriver;
 	
 	public StatsHelper(String round, String year) {
 		this.round = round;
 		this.year = year;
 	}
 	
-	private void setupChrome() {
-		ChromeOptions options = new ChromeOptions();
-		options.setBinary(chromeBin);
-		options.addArguments("--headless", "--disable-gpu", "--no-sandbox --incognito");
-		
-		webDriver = new ChromeDriver(options);
-	}
-	
-	private void setupPhantomjs() {
-		ArrayList<String> cliArgsCap = new ArrayList<String>();
-		DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
-		
-		cliArgsCap.add("--load-images=false");
-		
-		capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap);
-		capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_GHOSTDRIVER_CLI_ARGS, new String[] { "--webdriver-loglevel=NONE" });
-
-		webDriver = new PhantomJSDriver(capabilities);
-	}
-		
-	public Path execute() throws Exception {
+	private WebDriver getWebDriver() {
+		WebDriver webDriver;
 		
 		String headlessBrowser = System.getenv("HEADLESS_BROWSER");
-		
 		if(headlessBrowser.equalsIgnoreCase("phantomjs")) {
-			setupPhantomjs();
-		} else {
-			setupChrome();
-		}
+			DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();			
+			capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, new String[] { "--load-images=no", "--webdriver-loglevel=NONE" });
+			//capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_GHOSTDRIVER_CLI_ARGS, new String[] { "--webdriver-loglevel=NONE" });
 
+			webDriver = new PhantomJSDriver(capabilities);
+		} else {
+			ChromeOptions options = new ChromeOptions();
+			options.setBinary(chromeBin);
+			options.addArguments("--headless", "--disable-gpu", "--no-sandbox --incognito");
+			
+			webDriver = new ChromeDriver(options);
+		}
+		
+		return webDriver;
+	}
+		
+
+		
+	public Path execute() throws Exception {
 		Round roundFixtures = getRound();
 		RoundStats roundStats = createStats(roundFixtures);
 		Path csvFile = writeStatsCsv(roundStats);
-		
-		webDriver.quit();
-		
+				
 		return csvFile;
 	}
 	
@@ -98,7 +87,7 @@ public class StatsHelper {
 		String fixtureUrl = "http://www.afl.com.au/fixture?roundId=CD_R" + year + "014" + paddedRoundNo + "#tround";
 				
 		//logger.info("Loading fixture from: {}", fixtureUrl);
-		
+		WebDriver webDriver = getWebDriver();
 		webDriver.get(fixtureUrl);
 		
 		List<WebElement> webFixtures = webDriver.findElement(By.id("tround")).findElement(By.tagName("tbody")).findElements(By.className("team-logos"));
@@ -118,9 +107,9 @@ public class StatsHelper {
 			games.add(fixture);
 		}
 		
-		webDriver.close();
-		
 		roundFixutres.setGames(games);
+		
+		webDriver.quit();
 		
 		//if(System.getProperty("app.debug").equals("Y")) {
 		//	logger.debug("Round Games: {}", round);
@@ -168,24 +157,19 @@ public class StatsHelper {
 						
 		List<TeamStats> stats = new ArrayList<TeamStats>();
 					
-		try {				
-			webDriver.get(url);
-			
+		try {			
 			//logger.info("Getting home team stats: {}", homeTeam);
 			TeamStats homeTeamStats = new TeamStats();
 			homeTeamStats.setTeamId(homeTeam);
-			homeTeamStats.setTeamStats(getStats("h", webDriver));
+			homeTeamStats.setTeamStats(getStats(url, "h"));
 			
 			//logger.info("Getting away team stats: {}", awayTeam);
 			TeamStats awayTeamStats = new TeamStats();
 			awayTeamStats.setTeamId(awayTeam);
-			awayTeamStats.setTeamStats(getStats("a", webDriver));
+			awayTeamStats.setTeamStats(getStats(url, "a"));
 						
 			stats.add(homeTeamStats);
-			stats.add(awayTeamStats);
-			
-			webDriver.close();
-			
+			stats.add(awayTeamStats);			
 		} catch (Exception e) {} finally {} //ignore errors
 
 		//logger.info("Stats have been downloaded");
@@ -193,19 +177,22 @@ public class StatsHelper {
 		return stats;
 	}
 	
-	private List<PlayerStats> getStats(String homeORaway, WebDriver driver) throws Exception {
+	private List<PlayerStats> getStats(String url, String homeORaway) throws Exception {
 		
 		List<PlayerStats> teamStats = new ArrayList<PlayerStats>();
 		
-		driver.findElement(By.cssSelector("a[href='#full-time-stats']")).click();
-		driver.findElement(By.cssSelector("a[href='#advanced-stats']")).click();
+		WebDriver webDriver = getWebDriver();
+		webDriver.get(url);
+		
+		webDriver.findElement(By.cssSelector("a[href='#full-time-stats']")).click();
+		webDriver.findElement(By.cssSelector("a[href='#advanced-stats']")).click();
 
 		List<WebElement> statsRecs;
 		
 		if(homeORaway.equals("h")) {
-			statsRecs = driver.findElement(By.id("homeTeam-advanced")).findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
+			statsRecs = webDriver.findElement(By.id("homeTeam-advanced")).findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
 		} else {
-			statsRecs = driver.findElement(By.id("awayTeam-advanced")).findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
+			statsRecs = webDriver.findElement(By.id("awayTeam-advanced")).findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
 		}
 		
 		for(WebElement statsRec : statsRecs) {
@@ -234,6 +221,8 @@ public class StatsHelper {
 		//if(System.getProperty("app.debug").equals("Y")) {
 		//	logger.debug("Team stats: {}", teamStats);
 		//}
+		
+		webDriver.quit();
 		
 		return teamStats;
 	}
