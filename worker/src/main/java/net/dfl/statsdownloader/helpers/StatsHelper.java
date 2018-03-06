@@ -13,11 +13,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.opencsv.CSVWriter;
 
@@ -52,7 +55,15 @@ public class StatsHelper {
 	}
 	
 	private void setupPhantomjs() {
-		webDriver = new PhantomJSDriver();
+		ArrayList<String> cliArgsCap = new ArrayList<String>();
+		DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
+		
+		cliArgsCap.add("--load-images=false");
+		
+		capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap);
+		capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_GHOSTDRIVER_CLI_ARGS, new String[] { "--webdriver-loglevel=NONE" });
+
+		webDriver = new PhantomJSDriver(capabilities);
 	}
 		
 	public Path execute() throws Exception {
@@ -65,8 +76,6 @@ public class StatsHelper {
 			setupChrome();
 		}
 
-		
-		
 		Round roundFixtures = getRound();
 		RoundStats roundStats = createStats(roundFixtures);
 		Path csvFile = writeStatsCsv(roundStats);
@@ -108,6 +117,8 @@ public class StatsHelper {
 			
 			games.add(fixture);
 		}
+		
+		webDriver.close();
 		
 		roundFixutres.setGames(games);
 		
@@ -172,6 +183,8 @@ public class StatsHelper {
 						
 			stats.add(homeTeamStats);
 			stats.add(awayTeamStats);
+			
+			webDriver.close();
 			
 		} catch (Exception e) {} finally {} //ignore errors
 
