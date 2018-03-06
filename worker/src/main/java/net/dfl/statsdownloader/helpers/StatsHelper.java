@@ -17,6 +17,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
 import com.opencsv.CSVWriter;
 
@@ -31,7 +32,7 @@ public class StatsHelper {
 	private String round;
 	private String year;
 	
-	private static final String chromeBin = System.getenv("GOOGLE_CHROME_SHIM");
+	private static final String chromeBin = System.getenv("GOOGLE_CHROME_BIN");
 	
 	private WebDriver webDriver;
 	
@@ -42,14 +43,29 @@ public class StatsHelper {
 		this.year = year;
 	}
 	
-	
-	
-	public Path execute() throws Exception {
+	private void setupChrome() {
 		ChromeOptions options = new ChromeOptions();
 		options.setBinary(chromeBin);
-		options.addArguments("--headless", "--disable-gpu", "--no-sandbox");
+		options.addArguments("--headless", "--disable-gpu", "--no-sandbox --incognito");
 		
 		webDriver = new ChromeDriver(options);
+	}
+	
+	private void setupPhantomjs() {
+		webDriver = new PhantomJSDriver();
+	}
+		
+	public Path execute() throws Exception {
+		
+		String headlessBrowser = System.getenv("HEADLESS_BROWSER");
+		
+		if(headlessBrowser.equalsIgnoreCase("phantomjs")) {
+			setupPhantomjs();
+		} else {
+			setupChrome();
+		}
+
+		
 		
 		Round roundFixtures = getRound();
 		RoundStats roundStats = createStats(roundFixtures);
