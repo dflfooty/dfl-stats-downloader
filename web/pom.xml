@@ -54,7 +54,7 @@
 							<goal>repackage</goal>
 						</goals>
 						<configuration>
-							<finalName>web-${version}</finalName>
+							<finalName>web-${project.version}</finalName>
 							<excludes>
 								<exclude>
 									<groupId>org.flywaydb</groupId>

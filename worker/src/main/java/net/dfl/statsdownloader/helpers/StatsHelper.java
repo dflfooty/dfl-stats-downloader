@@ -17,6 +17,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -50,9 +51,9 @@ public class StatsHelper {
 		if(headlessBrowser.equalsIgnoreCase("phantomjs")) {
 			DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();			
 			capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, new String[] { "--load-images=no", "--webdriver-loglevel=NONE" });
-			//capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_GHOSTDRIVER_CLI_ARGS, new String[] { "--webdriver-loglevel=NONE" });
-
 			webDriver = new PhantomJSDriver(capabilities);
+		} else if(headlessBrowser.equalsIgnoreCase("htmlunit")) {
+			webDriver = new HtmlUnitDriver(true);
 		} else {
 			ChromeOptions options = new ChromeOptions();
 			options.setBinary(chromeBin);
