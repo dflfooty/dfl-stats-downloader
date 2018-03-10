@@ -19,7 +19,7 @@ public class WorkerService {
 	@Autowired
 	GoogleDriveService googleDriveService;
 		
-	public void work(Job job) throws Exception {
+	public void work(Job job) {
 
 		String status = "Completed";
 		
@@ -30,9 +30,7 @@ public class WorkerService {
 			Path statsCsvFile = statsHelper.execute();
 			
 			String csvFileUrl = googleDriveService.saveToGoogleDrive(statsCsvFile);
-			
-			System.out.println("File URL: " + csvFileUrl);
-			
+						
 			job.setFile(csvFileUrl);
 		} catch (Exception e) {
 			status = "Failed";
@@ -40,7 +38,5 @@ public class WorkerService {
 		} finally {
 			jobService.completeJob(job, status);
 		}
-		
-		
 	}
 }

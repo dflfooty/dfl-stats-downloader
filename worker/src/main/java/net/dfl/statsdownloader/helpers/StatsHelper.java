@@ -38,9 +38,7 @@ public class StatsHelper {
 	private String year;
 	
 	private static final String chromeBin = System.getenv("GOOGLE_CHROME_BIN");
-	
-	//private WebDriver webDriver;
-	
+		
 	public StatsHelper(String round, String year) {
 		this.round = round;
 		this.year = year;
@@ -76,8 +74,6 @@ public class StatsHelper {
 		return webDriver;
 	}
 		
-
-		
 	public Path execute() throws Exception {
 		Round roundFixtures = getRound();
 		RoundStats roundStats = createStats(roundFixtures);
@@ -97,8 +93,7 @@ public class StatsHelper {
 		}
 		
 		String fixtureUrl = "http://www.afl.com.au/fixture?roundId=CD_R" + year + "014" + paddedRoundNo + "#tround";
-				
-		//logger.info("Loading fixture from: {}", fixtureUrl);
+
 		WebDriver webDriver = getWebDriver();
 		webDriver.get(fixtureUrl);
 		
@@ -111,11 +106,7 @@ public class StatsHelper {
 			Fixture fixture = new Fixture();
 			fixture.setHomeTeam(webFixture.findElements(By.className("home")).get(0).getText());
 			fixture.setAwayTeam(webFixture.findElements(By.className("away")).get(0).getText());
-			
-			//if(System.getProperty("app.debug").equals("Y")) {
-			//	logger.debug("Fixture: {}", fixture);
-			//}
-			
+						
 			games.add(fixture);
 		}
 		
@@ -123,17 +114,10 @@ public class StatsHelper {
 		
 		webDriver.quit();
 		
-		//if(System.getProperty("app.debug").equals("Y")) {
-		//	logger.debug("Round Games: {}", round);
-		//}
-		
-		//logger.info("Fixtures Loaded");
-		
 		return roundFixutres;
 	}
 	
 	private RoundStats createStats(Round roundFixutres) {
-		//logger.info("Handling Stats Download for: year={}, round={}", year, this.round);
 		
 		RoundStats roundStats = new RoundStats();
 		List<TeamStats> stats = new ArrayList<TeamStats>();
@@ -144,21 +128,11 @@ public class StatsHelper {
 			String gameStr = game.getHomeTeam().toLowerCase() + "-v-" + game.getAwayTeam().toLowerCase();
 			String statsUrl = statsUri + gameStr;
 			
-			//logger.info("Stats URL: {}", statsUrl);
-			
 			List<TeamStats> teamStats = downloadStats(game.getHomeTeam().toLowerCase(), game.getHomeTeam().toLowerCase(), statsUrl);
 			stats.addAll(teamStats);
 		}
 		
 		roundStats.setRoundStats(stats);
-		//if(System.getProperty("app.debug").equals("Y")) {
-		//	logger.debug("Round stats: {}", roundStats);
-		//}
-		
-		//logger.info("Writing CSV");
-		//writeRobStatsCsv(roundStats);
-		
-		//logger.info("Stats Download Handler Completed");
 		
 		return roundStats;
 	}
@@ -169,13 +143,11 @@ public class StatsHelper {
 						
 		List<TeamStats> stats = new ArrayList<TeamStats>();
 					
-		try {			
-			//logger.info("Getting home team stats: {}", homeTeam);
+		try {
 			TeamStats homeTeamStats = new TeamStats();
 			homeTeamStats.setTeamId(homeTeam);
 			homeTeamStats.setTeamStats(getStats(url, "h"));
 			
-			//logger.info("Getting away team stats: {}", awayTeam);
 			TeamStats awayTeamStats = new TeamStats();
 			awayTeamStats.setTeamId(awayTeam);
 			awayTeamStats.setTeamStats(getStats(url, "a"));
@@ -183,8 +155,6 @@ public class StatsHelper {
 			stats.add(homeTeamStats);
 			stats.add(awayTeamStats);			
 		} catch (Exception e) {} finally {} //ignore errors
-
-		//logger.info("Stats have been downloaded");
 		
 		return stats;
 	}
@@ -224,15 +194,7 @@ public class StatsHelper {
 			playerStats.setGoals(stats.get(23).getText());
 			playerStats.setBehinds(stats.get(24).getText());
 			teamStats.add(playerStats);
-			
-			//if(System.getProperty("app.debug").equals("Y")) {
-			//	logger.debug("Player stats: {}", playerStats);
-			//}
 		}
-		
-		//if(System.getProperty("app.debug").equals("Y")) {
-		//	logger.debug("Team stats: {}", teamStats);
-		//}
 		
 		webDriver.quit();
 		
@@ -258,24 +220,14 @@ public class StatsHelper {
 		
 		Path csvFile = dir.resolve("stats-" + this.year + "-" + roundPadded + "_" + now + ".csv");
 		
-		//logger.info("CSV File: {}", dir + "/" + csvFile);
-		
 		Files.createDirectories(dir);
 		CSVWriter csvFileWriter = new CSVWriter(Files.newBufferedWriter(csvFile, Charset.forName("Cp1252"), new OpenOption[] {StandardOpenOption.CREATE, StandardOpenOption.WRITE}));
 		
 		List<String[]> rows = new ArrayList<String[]>();
 		
-		//if(System.getProperty("app.debug").equals("Y")) {
-		//	logger.debug("Round stats to be written: {}", roundStats);
-		//}
-		
 		for(TeamStats teamStats : roundStats.getRoundStats()) {
 			for(PlayerStats playerStats : teamStats.getTeamStats()) {
-				
-				//if(System.getProperty("app.debug").equals("Y")) {
-				//	logger.debug("Player to be written: {}", playerStats);
-				//}		
-				
+
 				rows.add(new String[]{playerStats.getName(),
 									  playerStats.getDisposals(), 
 									  playerStats.getMarks(),  
@@ -284,18 +236,13 @@ public class StatsHelper {
 									  playerStats.getFreesAgainst(),
 									  playerStats.getTackles(),
 									  playerStats.getGoals()});
-				
-				//if(System.getProperty("app.debug").equals("Y")) {
-				//	logger.debug("CSV Row: {}", (Object[])rows.get(rows.size()-1));
-				//}
 			}
 		}
 		
 		csvFileWriter.writeAll(rows);
 		csvFileWriter.flush();
 		csvFileWriter.close();
-		//logger.info("CSV File written");
-		
+
 		return csvFile;
 	}
 }

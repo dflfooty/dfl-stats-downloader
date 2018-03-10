@@ -3,6 +3,8 @@ package net.dfl.statsdownloader.service;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ import net.dfl.statsdownloader.pubsub.RedisMessagePublisher;
 
 @Service
 public class JobService {
+	
+	private static final Logger log = LoggerFactory.getLogger(JobService.class);
 
 	@Autowired
 	private JobRespository jobRespositry;
@@ -27,7 +31,7 @@ public class JobService {
 	
 	public Job submitNewJob(Job job) {
 		if(jobRespositry.submittedJobExists(job)) {
-			System.out.println("Job Exists: " + job);
+			log.info("Job exists: {}", job);
 			throw new JobSubmittedException();
 		}
 		
@@ -38,6 +42,8 @@ public class JobService {
 		
 		Job savedJob = jobRespositry.saveAndFlush(job);
 		jobPublisher.publish(savedJob);
+		
+		log.info("Published job: {}", savedJob);
 		
 		return savedJob;
 	}
@@ -51,6 +57,8 @@ public class JobService {
 		
 		Job savedJob = jobRespositry.saveAndFlush(job);
 		
+		log.info("Running job: {}", savedJob);
+		
 		return savedJob;
 	}
 	
@@ -61,7 +69,7 @@ public class JobService {
 		
 		Job savedJob = jobRespositry.saveAndFlush(job);
 		
-		System.out.println("Completed Job: " + savedJob);
+		log.info("Completed job: {}", savedJob);
 		
 		return savedJob;
 	}
@@ -71,8 +79,9 @@ public class JobService {
 		for(Job job : uncompletedJobs) {
 			Date now = new Date();
 			job.setUpdatedAt(now);
-			job.setStatus("Uncompleted");
+			job.setStatus("Cancelled");
 			jobRespositry.save(job);
+			log.info("Cleaned job: {}", job);
 		}
 		jobRespositry.flush();
 	}

@@ -1,5 +1,7 @@
 package net.dfl.statsdownloader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -11,6 +13,8 @@ import net.dfl.statsdownloader.pubsub.RedisMessageSubscriber;
 @Service
 public class WorkerSubscriber implements RedisMessageSubscriber {
 	
+	private static final Logger log = LoggerFactory.getLogger(WorkerSubscriber.class);
+	
 	@Autowired
 	WorkerService worker;
 	
@@ -21,16 +25,10 @@ public class WorkerSubscriber implements RedisMessageSubscriber {
         
         if(obj != null && obj instanceof Job) {
         		Job job = (Job) obj;
-        		System.out.println("Recived Job: " + job);
-        		try {
-        				worker.work(job);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+        		log.info("Channel: {} - Received job: {}", redisMessage.getChannel(), job);
+        		worker.work(job);
         } else {
-        		System.out.println("Message received on channel <" + new String(redisMessage.getChannel()) + ">: failed to deserialize");
+        		log.info("Channel: {} - Failed to deserialize message", redisMessage.getChannel());
         }
     }
-	
-	
 }
