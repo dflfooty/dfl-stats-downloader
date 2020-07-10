@@ -21,7 +21,7 @@
 		<module>common</module>
 		<module>web</module>
 		<module>worker</module>
-		<!--<module>heroku-app-deploy</module>-->
+		<module>heroku-app-deploy</module>
 	</modules>
 
 	<properties>
@@ -34,6 +34,13 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<!--<plugin>
 				<groupId>com.heroku.sdk</groupId>
 				<artifactId>heroku-maven-plugin</artifactId>
                 <version>3.0.2</version>
@@ -50,7 +57,7 @@
 						<worker>java -jar worker/target/worker-0.0.1-SNAPSHOT.jar</worker>
 					</processTypes>
 				</configuration>
-			</plugin>
+			</plugin>-->
 		</plugins>
 	</build>
 

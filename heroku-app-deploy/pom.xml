@@ -53,7 +53,7 @@
                 <executions>
                     <execution>
 						<id>deploy-heroku-app</id>
-                        <phase>package</phase>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>deploy</goal>
                         </goals>
