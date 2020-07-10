@@ -21,6 +21,7 @@
 		<module>common</module>
 		<module>web</module>
 		<module>worker</module>
+		<!--<module>heroku-app-deploy</module>-->
 	</modules>
 
 	<properties>
@@ -29,5 +30,46 @@
 		<selenium.version>3.9.1</selenium.version>
 		<selenium-htmlunit.version>2.29.0</selenium-htmlunit.version>
 	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.heroku.sdk</groupId>
+				<artifactId>heroku-maven-plugin</artifactId>
+                <version>3.0.2</version>
+				<inherited>false</inherited>
+				<configuration>
+					<jdkVersion>1.8</jdkVersion>
+					<includes>
+						<include>web/target/web-0.0.1-SNAPSHOT.jar</include>
+						<include>worker/target/worker-0.0.1-SNAPSHOT.jar</include>
+					</includes>
+					<includeTarget>false</includeTarget>
+					<processTypes>
+						<web>java -jar web/target/web-0.0.1-SNAPSHOT.jar</web>
+						<worker>java -jar worker/target/worker-0.0.1-SNAPSHOT.jar</worker>
+					</processTypes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>heroku-staging</id>
+			<build>
+				<plugins>
+					<plugin>
+					<groupId>com.heroku.sdk</groupId>
+					<artifactId>heroku-maven-plugin</artifactId>
+					<version>3.0.2</version>
+					<configuration>
+						<appName>dfl-stats-downloader-staging</appName>
+					</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
